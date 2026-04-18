@@ -1,0 +1,133 @@
+#include <iostream>
+#include <cstdlib>
+#include <ctime>
+using namespace std;
+
+// Base Class
+class Payment {
+protected:
+    int transactionID;
+
+public:
+    Payment() {
+        transactionID = rand() % 10000 + 1000;
+    }
+
+    virtual void pay(double amount) {
+        cout << "Processing payment of Rs. " << amount << endl;
+    }
+
+    void showTransaction() {
+        cout << "Transaction ID: " << transactionID << endl;
+    }
+};
+
+// Credit Card Class
+class CreditCard : public Payment {
+public:
+    void pay(double amount) override {
+        int pin;
+        cout << "Enter 4-digit PIN: ";
+        cin >> pin;
+
+        if(pin >= 1000 && pin <= 9999) {
+            cout << "Payment of Rs. " << amount << " successful via Credit Card." << endl;
+            showTransaction();
+        } else {
+            cout << "Invalid PIN. Payment Failed." << endl;
+        }
+    }
+};
+
+// UPI Class
+class UPI : public Payment {
+public:
+    void pay(double amount) override {
+        int otp;
+        cout << "Enter OTP: ";
+        cin >> otp;
+
+        if(otp == 1234) {
+            cout << "Payment of Rs. " << amount << " successful via UPI." << endl;
+            showTransaction();
+        } else {
+            cout << "Incorrect OTP. Payment Failed." << endl;
+        }
+    }
+};
+
+// Wallet Class
+class Wallet : public Payment {
+public:
+    void pay(double amount) override {
+        double balance = 1000;
+
+        if(amount <= balance) {
+            cout << "Payment of Rs. " << amount << " successful via Wallet." << endl;
+            cout << "Remaining Balance: Rs. " << balance - amount << endl;
+            showTransaction();
+        } else {
+            cout << "Insufficient Balance." << endl;
+        }
+    }
+};
+
+int main() {
+    srand(time(0));
+
+    int choice;
+    double amount;
+    char cont;
+    int transactionCount = 0;
+
+    do {
+        cout << "\n===== Online Payment System =====" << endl;
+        cout << "1. Credit Card\n2. UPI\n3. Wallet\n4. Exit" << endl;
+        cout << "Enter your choice: ";
+        cin >> choice;
+
+        if(choice == 4) {
+            cout << "Exiting program..." << endl;
+            break;
+        }
+
+        cout << "Enter amount: ";
+        cin >> amount;
+
+        if(amount <= 0) {
+            cout << "Invalid amount!" << endl;
+            continue;
+        }
+
+        Payment* p = NULL;
+
+        switch(choice) {
+            case 1:
+                p = new CreditCard();
+                break;
+            case 2:
+                p = new UPI();
+                break;
+            case 3:
+                p = new Wallet();
+                break;
+            default:
+                cout << "Invalid choice!" << endl;
+                continue;
+        }
+
+        p->pay(amount);
+        transactionCount++;
+
+        delete p;
+
+        cout << "\nDo you want to continue? (y/n): ";
+        cin >> cont;
+
+    } while(cont == 'y' || cont == 'Y');
+
+    cout << "\nTotal Transactions Done: " << transactionCount << endl;
+    cout << "Thank you for using the system!" << endl;
+
+    return 0;
+}
